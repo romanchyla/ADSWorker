@@ -2,7 +2,6 @@
 
 from .. import app
 from ADSWorker.pipeline import generic
-from .. import matcher
 
 
 class ExampleWorker(generic.RabbitMQWorker):

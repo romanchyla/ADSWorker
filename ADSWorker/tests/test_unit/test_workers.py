@@ -17,8 +17,10 @@ import datetime
 from dateutil import parser
 from mock import patch
 
+from ADSWorker import app
 from ADSWorker.tests import test_base
 from ADSWorker.models import Base
+from ADSWorker.pipeline.example import ExampleWorker
 
 class TestWorkers(test_base.TestUnit):
     """
@@ -39,12 +41,12 @@ class TestWorkers(test_base.TestUnit):
         Base.metadata.create_all()
         return app
     
-    @patch('ADSWorker.pipeline.generic.ExampleWorker.publish', return_value=None)
-    def test_output_handler(self, *args):
+    @patch('ADSWorker.pipeline.example.ExampleWorker.publish', return_value=None)
+    def test_example_worker(self, *args):
         """Check it is publishing data"""
-        worker = workers.OutputHandler.OutputHandler()
+        worker = ExampleWorker()
         worker.process_payload({u'foo': u'bar', u'baz': [1,2]})
-        worker.publish.assert_called_with({u'foo': u'bar', u'baz': [1,2]}, topic='SolrUpdateRoute')
+        worker.publish.assert_called_with({u'foo': u'bar', u'baz': [1,2]})
     
     
 

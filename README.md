@@ -5,37 +5,24 @@
 
 A generic template for building ADS pipeline applicaitons.
 
-To build your own worker, do the following:
+To build your own worker, first clone this repository and rename stuff.
 
 1. git clone git@github.com:adsabs/ADSWorker.git
-2. `init.sh MyNewName`
+2. `init.sh ADSMyNewName`
 
-ORCID metadata enrichment pipeline - grabs claims from the API and enriches ADS storage/index.
-
-How it works:
-
-    1. periodically check ADS API (using a special OAuth token that gives access to ORCID updates)
-    1. fetches the claims and puts them into the RabbitMQ queue
-    1. a worker grabs the claim and enriches it with information about the author (querying both
-       public ORCID API for the author's name and ADS API for variants of the author name)
-    1. given the info above, it updates MongoDB (collection orcid_claims) - it marks the claim
-       either as 'verified' (if it comes from a user with an account in BBB) or 'unverified'
-       
-       (it is the responsibility of the ADS Import pipeline to pick orcid claims and send them to
-       SOLR for indexing)
-       
+Then commit the results into a new repository. (and remove this section from the README)       
        
 
 dev setup - vagrant (docker)
 ============================
 
 1. vim ADSWorker/local_config.py #edit, edit
-1. `vagrant up db rabbitmq app`
+1. `vagrant up db rabbitmq app --provider=docker`
 1. `vagrant ssh app`
 1. `cd /vagrant`
 
-This will start the pipeline inside the `app` container - if you have configured endpoints and
-access tokens correctly, it starts fetching data from orcid.
+This will start the pipeline inside the `app` container - make sure you have configured endpoints and
+access tokens correctly.
 
 We are using 'docker' provider (ie. instead of virtualbox VM, you run the processes in docker).
 On some systems, it is necessary to do: `export VAGRANT_DEFAULT_PROVIDER=docker` or always 
@@ -47,14 +34,14 @@ The  directory is synced to /vagrant/ on the guest.
 dev setup - local editing
 =========================
 
-If you (also) hate when stuff is unnecessarily complicated, then you can also run/develop locally
+If you (also) hate when stuff is unnecessarily complicated, then you can run/develop locally
 (using whatever editor/IDE/debugger you like)
 
 1. virtualenv python
 1. source python/bin/activate
 1. pip install -r requirements.txt
 1. pip install -r dev-requirements.txt
-1. vagrant `up db rabbitmq`
+1. vagrant `up db rabbitmq --provider=docker`
 
 This will setup python `virtualenv` and the database + rabbitmq. You can run the pipeline and 
 tests locally. 
@@ -73,7 +60,7 @@ Database
 
 `vagrant up db`
 
-MongoDB is on localhost:37017, PostgreSQL on localhost:6432
+PostgreSQL on localhost:6432
 
 
 

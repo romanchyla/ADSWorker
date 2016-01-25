@@ -25,8 +25,7 @@ Vagrant.configure("2") do |config|
         d.build_dir = "manifests/development/db"
         d.has_ssh = true
         d.name = "db"
-        d.ports = ["37017:27017", "6432:5432"]
-        #d.volumes = ["data/postgres:/var/lib/postgresql/data", "data/mongodb:/data/db"]
+        d.ports = ["6432:5432"]
       end
     end
     
@@ -40,15 +39,6 @@ Vagrant.configure("2") do |config|
       end
     end
     
-    config.vm.define "imp" do |app|
-      app.vm.provider "docker" do |d|
-        d.cmd     = ["/sbin/my_init", "--enable-insecure-key"]
-        d.build_dir = "manifests/development/import-pipeline"
-        d.has_ssh = true
-        d.name = "imp"
-      end
-    end
-  
     config.ssh.username = "root"
     config.ssh.private_key_path = "insecure_key"
     

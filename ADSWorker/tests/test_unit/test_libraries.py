@@ -20,7 +20,7 @@ import mock
 from io import BytesIO
 
 from ADSWorker.tests import test_base
-from ADSWorker import matcher, app, updater, importer, utils
+from ADSWorker import app, utils
 from ADSWorker.models import Base, KeyValue
 
 class TestLibraries(test_base.TestUnit):
