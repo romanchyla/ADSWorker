@@ -8,20 +8,16 @@ Pipeline to extract full text documents. It carries out the following:
 """
 
 
-import sys
-import os
-
-
-import multiprocessing
-import threading
-import time
-import signal
-import sys
-import os
 from ADSWorker import app
-from ADSWorker.pipeline import workers, GenericWorker
+from ADSWorker.pipeline import generic
 from ADSWorker.utils import setup_logging
 from copy import deepcopy
+import multiprocessing
+import os
+import signal
+import sys
+import threading
+import time
 
 
 logger = setup_logging(os.path.abspath(os.path.join(__file__, '..')), __name__)
@@ -34,7 +30,7 @@ class Singleton(object):
 
     _instances = {}
 
-    def __call__(cls, *args, **kwargs):
+    def __call__(cls, *args, **kwargs):  # @NoSelf
         if cls not in cls._instances:
             cls._instances[cls] = \
                 super(Singleton, cls).__call__(*args, **kwargs)
@@ -94,7 +90,7 @@ class TaskMaster(Singleton):
         :return: no return
         """
 
-        w = GenericWorker.RabbitMQWorker()
+        w = generic.RabbitMQWorker()
         w.connect(self.rabbitmq_url)
         
         # make sure the exchange is there
@@ -227,7 +223,7 @@ class TaskMaster(Singleton):
             
             conc = params.get('concurrency', 1)
             while len(params['active']) < conc:
-                w = eval('workers.{0}.{0}'.format(worker))(params)
+                w = eval('{0}'.format(worker))(params)
                 
                 # decide if we want to run it multiprocessing
                 if conc > 1:

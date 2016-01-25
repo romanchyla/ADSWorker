@@ -18,7 +18,7 @@ RUN apt-get update --fix-missing
 RUN apt-get install -y python-pip ipython python-dev libpq-dev git
 RUN pip install --upgrade pip
 
-RUN git clone https://github.com/adsabs/ADSimportpipeline /app
+RUN git clone https://github.com/adsabs/ADSWorker /app
 WORKDIR /app
 RUN pip install -r requirements.txt
 

@@ -15,14 +15,6 @@ RUN /usr/sbin/enable_insecure_key
 EXPOSE 22
 
 
-#=========== MONGODB ==================
-
-RUN apt-get update && apt-get install -y mongodb 
-RUN mkdir -p /data/db
-#RUN mkdir -p /vagrant/data/mongodb
-#RUN ln -s /vagrant/data/mongodb /data/db
-EXPOSE 27017
-
 #=========== POSTGRESQL ===============
 
 RUN apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8
@@ -69,7 +61,4 @@ RUN mkdir -p /etc/service/postgres
 RUN echo "#!/bin/bash\nexec /sbin/setuser postgres /usr/lib/postgresql/9.3/bin/postgres -c config_file=/etc/postgresql/9.3/main/postgresql.conf" > /etc/service/postgres/run
 RUN chmod +x /etc/service/postgres/run
 
-RUN mkdir -p /etc/service/mongodb
-RUN echo "#!/bin/bash\n/usr/bin/mongod --smallfiles" > /etc/service/mongodb/run
-RUN chmod +x /etc/service/mongodb/run
 

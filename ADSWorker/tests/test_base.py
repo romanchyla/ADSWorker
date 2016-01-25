@@ -12,7 +12,8 @@ import time
 import json
 import pika
 from ADSWorker import utils, app
-from ..pipeline import pstart, workers, GenericWorker
+from ..pipeline import pstart
+from ADSWorker.pipeline import generic
 
 
 
@@ -59,7 +60,7 @@ class TestFunctional(TestUnit):
         # to connect
         app = self.app
         TM = pstart.TaskMaster(app.config.get('RABBITMQ_URL'),
-                        'ads-orcid-test',
+                        'ADSWorker-test-exchange',
                         app.config.get('QUEUES'),
                         app.config.get('WORKERS'))
         TM.initialize_rabbitmq()
@@ -77,13 +78,13 @@ class TestFunctional(TestUnit):
 
     def connect_publisher(self):
         """
-        Makes a connection between the GenericWorker and the RabbitMQ instance, and
+        Makes a connection between the generic and the RabbitMQ instance, and
         sets up an attribute as a channel.
 
         :return: no return
         """
 
-        self.publish_worker = GenericWorker.RabbitMQWorker()
+        self.publish_worker = generic.RabbitMQWorker()
         self.ret_queue = self.publish_worker.connect(self.app.config.get('RABBITMQ_URL'))
 
         
