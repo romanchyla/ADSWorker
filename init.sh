@@ -38,10 +38,10 @@ if ! hash virtualenv 2>/dev/null
              then 
                   echo "sudo pip install virtualenv"
                   sudo pip install virtualenv
+         else
+              echo "Cannot continue if you do not install virtualenv, aborting"
+              exit 1
          fi
-     else
-          echo "Cannot continue if you do not install virtualenv, aborting"
-          exit 1  
 fi
          
 virtualenv python
