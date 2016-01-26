@@ -8,8 +8,8 @@ function search_replace() {
     read -p "Recursive '$1' -> '$2' in $folder? [y]:" answer
     if [ "${answer:-y}" == "y" ]
          then
-             echo "find $folder -type f -print0 | xargs -0 sed -i \"s/$1/$2/g\""
-             find $folder -type f -print0 | xargs -0 sed -i "s/$1/$2/g"
+             echo "find $folder -type f -print0 | xargs -0 sed -i \"s@$1@$2@g\""
+             find $folder -type f -print0 | xargs -0 sed -i "s@$1@$2@g"
     fi
 }
 
