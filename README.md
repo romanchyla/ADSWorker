@@ -34,6 +34,8 @@ This pipeline is doing XYZ.
     `$ source python/bin/activate`
     `$ pip install -r requirements.txt`
     `$ pip install -r dev-requirements.txt`
+    `$ vim local_config.py` # edit, edit
+    `$ alembic upgrade head` # initialize database
     
 ## Testing
 
