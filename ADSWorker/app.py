@@ -1,5 +1,5 @@
 from .models import KeyValue
-from . import utils
+import adsputils
 from celery import Celery
 from contextlib import contextmanager
 from sqlalchemy import create_engine
@@ -13,7 +13,7 @@ def create_app(app_name='ADSWorker',
                local_config=None):
     """Builds and initializes the Celery application."""
     
-    conf = utils.load_config()
+    conf = adsputils.load_config()
     if local_config:
         conf.update(local_config)
 
@@ -30,10 +30,11 @@ class ADSWorkerCelery(Celery):
     
     def __init__(self, app_name, *args, **kwargs):
         Celery.__init__(self, *args, **kwargs)
-        self._config = utils.load_config()
+        self._config = adsputils.load_config()
         self._session = None
         self._engine = None
-        self.logger = utils.setup_logging(app_name, app_name) #default logger
+        self._app_name = app_name
+        self.logger = adsputils.setup_logging(app_name) #default logger
         
     
 
@@ -51,7 +52,7 @@ class ADSWorkerCelery(Celery):
             self._config.update(config) #our config
             self.conf.update(config) #celery's config (devs should be careful to avoid clashes)
         
-        self.logger = utils.setup_logging(__file__, 'app', self._config.get('LOGGING_LEVEL', 'INFO'))
+        self.logger = adsputils.setup_logging(self._app_name, self._config.get('LOGGING_LEVEL', 'INFO'))
         self._engine = create_engine(config.get('SQLALCHEMY_URL', 'sqlite:///'),
                                echo=config.get('SQLALCHEMY_ECHO', False))
         self._session_factory = sessionmaker()

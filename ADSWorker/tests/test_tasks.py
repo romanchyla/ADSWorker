@@ -4,7 +4,7 @@ import json
 
 from mock import patch
 import unittest
-from ADSWorker import app, utils, tasks
+from ADSWorker import app, tasks
 from ADSWorker.models import Base
 
 
@@ -35,7 +35,7 @@ class TestWorkers(unittest.TestCase):
         
         # just for illustration how to mock multiple objects in one go
         with patch.object(self.app, 'close_app') as example_method, \
-            patch.object(tasks.hello_world_logger, 'info') as logger:
+            patch.object(tasks.logger, 'info') as logger:
             
             tasks.task_hello_world({'name': 'Elgar'})
             self.assertTrue('Hello Elgar we have recorded' in logger.call_args[0][0])

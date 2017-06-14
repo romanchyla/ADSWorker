@@ -1,7 +1,7 @@
 
 from __future__ import absolute_import, unicode_literals
 from ADSWorker import app as app_module
-from ADSWorker import utils
+import adsputils
 from ADSWorker import exceptions
 from ADSWorker.models import KeyValue
 from celery import Task
@@ -20,9 +20,8 @@ app.conf.CELERY_QUEUES = (
     Queue('some-queue', exch, routing_key='check-orcidid')
 )
 
-# set of logger used by the workers below
-error_logger = utils.setup_logging('error-queue', 'task:error', app.conf.get('LOGGING_LEVEL', 'INFO'))
-hello_world_logger = utils.setup_logging('some-queue', 'task:hello_world', app.conf.get('LOGGING_LEVEL', 'INFO'))
+
+logger = adsputils.setup_logging('ADSWorker', app.conf.get('LOGGING_LEVEL', 'INFO'))
 
 
 # connection to the other virtual host (for sending data out)
@@ -31,7 +30,7 @@ forwarding_connection = BrokerConnection(app.conf.get('OUTPUT_CELERY_BROKER',
                                          app.conf.get('OUTPUT_EXCHANGE', 'other-pipeline'))))
 class MyTask(Task):
     def on_failure(self, exc, task_id, args, kwargs, einfo):
-        error_logger.error('{0!r} failed: {1!r}'.format(task_id, exc))
+        logger.error('{0!r} failed: {1!r}'.format(task_id, exc))
 
 
 
@@ -61,12 +60,12 @@ def task_hello_world(message):
         if kv is None:
             kv = KeyValue(key=message['name'])
         
-        now = utils.get_date()
+        now = adsputils.get_date()
         kv.value = now
         session.add(kv)
         session.commit()
         
-        hello_world_logger.info('Hello {key} we have recorded seeing you at {value}'.format(**kv.toJSON()))
+        logger.info('Hello {key} we have recorded seeing you at {value}'.format(**kv.toJSON()))
         
         
     
