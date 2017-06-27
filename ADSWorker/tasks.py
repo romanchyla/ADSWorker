@@ -1,42 +1,25 @@
 
 from __future__ import absolute_import, unicode_literals
 from ADSWorker import app as app_module
-import adsputils
-from ADSWorker import exceptions
+from adsputils import get_date, exceptions
 from ADSWorker.models import KeyValue
-from celery import Task
-from celery.utils.log import get_task_logger
-from kombu import Exchange, Queue, BrokerConnection
-import datetime
-
+from kombu import Queue
 
 # ============================= INITIALIZATION ==================================== #
 
-app = app_module.create_app()
-exch = Exchange(app.conf.get('CELERY_DEFAULT_EXCHANGE', 'ADSWorker'), 
-                type=app.conf.get('CELERY_DEFAULT_EXCHANGE_TYPE', 'topic'))
+app = app_module.ADSWorkerPipelineCelery('ADSWorker')
+logger = app.logger
+
+
 app.conf.CELERY_QUEUES = (
-    Queue('errors', exch, routing_key='errors', durable=False, message_ttl=24*3600*5),
-    Queue('some-queue', exch, routing_key='check-orcidid')
+    Queue('errors', app.exchange, routing_key='errors', durable=False, message_ttl=24*3600*5),
+    Queue('some-queue', app.exchange, routing_key='some-queue')
 )
-
-
-logger = adsputils.setup_logging('ADSWorker', app.conf.get('LOGGING_LEVEL', 'INFO'))
-
-
-# connection to the other virtual host (for sending data out)
-forwarding_connection = BrokerConnection(app.conf.get('OUTPUT_CELERY_BROKER',
-                              '%s/%s' % (app.conf.get('CELRY_BROKER', 'pyamqp://'),
-                                         app.conf.get('OUTPUT_EXCHANGE', 'other-pipeline'))))
-class MyTask(Task):
-    def on_failure(self, exc, task_id, args, kwargs, einfo):
-        logger.error('{0!r} failed: {1!r}'.format(task_id, exc))
-
 
 
 # ============================= TASKS ============================================= #
 
-@app.task(base=MyTask, queue='some-queue')
+@app.task(queue='some-queue')
 def task_hello_world(message):
     """
     Fetch a message from the queue. Save it into the database.
@@ -60,7 +43,7 @@ def task_hello_world(message):
         if kv is None:
             kv = KeyValue(key=message['name'])
         
-        now = adsputils.get_date()
+        now = get_date()
         kv.value = now
         session.add(kv)
         session.commit()
